@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import '../styles/APICard.css';
 import { CORS_PROXY } from '../data/apis';
+import { renderResponse } from '../utils/responseRenderer';
 
 function APICard({ api }) {
   const [response, setResponse] = useState('');
@@ -130,7 +131,7 @@ function APICard({ api }) {
         
         setError(errorMsg);
       } else {
-        setResponse(JSON.stringify(data, null, 2));
+        setResponse(data);
       }
     } catch (err) {
       setError(
@@ -211,10 +212,10 @@ function APICard({ api }) {
 
         {response && (
           <div className="response-container">
-            <pre className="response-text">{response}</pre>
+            {renderResponse(response).content}
             <button
               onClick={() => {
-                navigator.clipboard.writeText(response);
+                navigator.clipboard.writeText(JSON.stringify(response, null, 2));
                 alert('Response copied to clipboard!');
               }}
               className="copy-btn"
