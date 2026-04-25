@@ -1,0 +1,275 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+}
+
+.App {
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.header {
+  text-align: center;
+  color: white;
+  margin-bottom: 40px;
+  animation: slideDown 0.6s ease-out;
+}
+
+.header h1 {
+  font-size: 3em;
+  margin-bottom: 10px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.header p {
+  font-size: 1.2em;
+  opacity: 0.9;
+}
+
+.controls {
+  max-width: 1400px;
+  margin: 0 auto 30px;
+  background: white;
+  padding: 25px;
+  border-radius: 15px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+.search-input {
+  width: 100%;
+  padding: 12px 20px;
+  font-size: 1em;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  transition: all 0.3s ease;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 10px rgba(102, 126, 234, 0.3);
+}
+
+.category-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 10px;
+}
+
+.category-btn {
+  padding: 8px 16px;
+  border: 2px solid #e0e0e0;
+  background: white;
+  border-radius: 25px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.category-btn:hover {
+  border-color: #667eea;
+  color: #667eea;
+}
+
+.category-btn.active {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-color: transparent;
+}
+
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 25px;
+  animation: fadeIn 0.6s ease-out 0.2s both;
+}
+
+.api-list {
+  background: white;
+  padding: 25px;
+  border-radius: 15px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  max-height: 80vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.api-list h2 {
+  margin-bottom: 20px;
+  color: #333;
+  font-size: 1.5em;
+}
+
+.api-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.api-item {
+  padding: 15px;
+  border: 2px solid #f0f0f0;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: white;
+}
+
+.api-item:hover {
+  border-color: #667eea;
+  background: #f9f9ff;
+  transform: translateX(5px);
+}
+
+.api-item.selected {
+  border-color: #667eea;
+  background: linear-gradient(135deg, #f5f7ff 0%, #eff2ff 100%);
+  box-shadow: 0 5px 20px rgba(102, 126, 234, 0.3);
+}
+
+.api-item h3 {
+  margin-bottom: 8px;
+  color: #333;
+  font-size: 1.1em;
+}
+
+.api-item p {
+  color: #666;
+  font-size: 0.9em;
+  margin-bottom: 10px;
+  line-height: 1.4;
+}
+
+.category-badge {
+  display: inline-block;
+  background: #e8eef7;
+  color: #667eea;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 0.8em;
+  font-weight: 600;
+}
+
+.api-tester {
+  background: white;
+  padding: 25px;
+  border-radius: 15px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+  color: #999;
+  text-align: center;
+}
+
+.empty-state h2 {
+  font-size: 2em;
+  margin-bottom: 15px;
+}
+
+.empty-state p {
+  font-size: 1.1em;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Scrollbar styling */
+.api-list::-webkit-scrollbar,
+.api-tester::-webkit-scrollbar {
+  width: 8px;
+}
+
+.api-list::-webkit-scrollbar-track,
+.api-tester::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.api-list::-webkit-scrollbar-thumb,
+.api-tester::-webkit-scrollbar-thumb {
+  background: #667eea;
+  border-radius: 10px;
+}
+
+.api-list::-webkit-scrollbar-thumb:hover,
+.api-tester::-webkit-scrollbar-thumb:hover {
+  background: #764ba2;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .container {
+    grid-template-columns: 1fr;
+  }
+
+  .api-list,
+  .api-tester {
+    max-height: 60vh;
+  }
+
+  .header h1 {
+    font-size: 2em;
+  }
+}
+
+@media (max-width: 768px) {
+  .controls {
+    padding: 15px;
+  }
+
+  .category-buttons {
+    gap: 5px;
+  }
+
+  .category-btn {
+    padding: 6px 12px;
+    font-size: 0.9em;
+  }
+
+  .header h1 {
+    font-size: 1.8em;
+  }
+
+  .header p {
+    font-size: 1em;
+  }
+}
+
