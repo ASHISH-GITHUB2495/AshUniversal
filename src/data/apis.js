@@ -1,5 +1,5 @@
 // CORS Proxy helper - use for APIs that don't support CORS
-const CORS_PROXY = "https://api.allorigins.win/raw?url=";
+export const CORS_PROXY = "https://api.allorigins.win/raw?url=";
 
 export const freeApis = [
   // Animals
