@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import '../styles/APICard.css';
+import { CORS_PROXY } from '../data/apis';
 
 function APICard({ api }) {
   const [response, setResponse] = useState('');
@@ -7,11 +8,13 @@ function APICard({ api }) {
   const [error, setError] = useState('');
   const [requestBody, setRequestBody] = useState('');
   const [queryParams, setQueryParams] = useState('');
+  const [usedProxy, setUsedProxy] = useState(false);
 
   const handleCall = async () => {
     setLoading(true);
     setError('');
     setResponse('');
+    setUsedProxy(false);
 
     try {
       let url = api.endpoint;
@@ -43,24 +46,52 @@ function APICard({ api }) {
       }
 
       let response;
+      let finalUrl = url;
+      let attemptedWithProxy = false;
+
       try {
+        // First attempt: try direct request
         response = await fetch(url, options);
       } catch (fetchErr) {
-        if (fetchErr.message.includes('Failed to fetch')) {
-          setError(
-            `❌ CORS Error or Network Issue\n\n` +
-            `Why: The API server blocked the request from your browser.\n\n` +
-            `What: This usually happens because:\n` +
-            `• The API doesn't allow cross-origin requests\n` +
-            `• Your internet connection is down\n` +
-            `• The API server is offline\n\n` +
-            `Try: Test the API directly at: ${url}`
-          );
+        // Second attempt: try with CORS proxy if available
+        if (api.corsProxy && fetchErr.message.includes('Failed to fetch')) {
+          attemptedWithProxy = true;
+          setUsedProxy(true);
+          try {
+            finalUrl = CORS_PROXY + encodeURIComponent(url);
+            response = await fetch(finalUrl, {
+              method: 'GET', // CORS proxy only supports GET
+              headers: {
+                'Accept': 'application/json',
+              },
+            });
+          } catch (proxyErr) {
+            setError(
+              `❌ CORS Error - Proxy Also Failed\n\n` +
+              `Why: The API doesn't allow cross-origin requests, and the proxy couldn't help.\n\n` +
+              `What: This API has strict CORS restrictions.\n\n` +
+              `Try: Test the API directly at: ${url}`
+            );
+            setLoading(false);
+            return;
+          }
         } else {
-          setError(`❌ Network Error: ${fetchErr.message}`);
+          if (fetchErr.message.includes('Failed to fetch')) {
+            setError(
+              `❌ CORS Error or Network Issue\n\n` +
+              `Why: The API server blocked the request from your browser.\n\n` +
+              `What: This usually happens because:\n` +
+              `• The API doesn't allow cross-origin requests\n` +
+              `• Your internet connection is down\n` +
+              `• The API server is offline\n\n` +
+              `Try: Test the API directly at: ${url}`
+            );
+          } else {
+            setError(`❌ Network Error: ${fetchErr.message}`);
+          }
+          setLoading(false);
+          return;
         }
-        setLoading(false);
-        return;
       }
 
       let data;
@@ -167,6 +198,12 @@ function APICard({ api }) {
 
       <div className="api-response">
         <h3>Response:</h3>
+        
+        {usedProxy && (
+          <div className="proxy-notice">
+            ✅ Note: Request was proxied through CORS handler (original API doesn't allow direct browser requests)
+          </div>
+        )}
         
         {error && (
           <div className="error-message">

@@ -159,6 +159,17 @@
   margin: 0;
 }
 
+.proxy-notice {
+  background: #e8f5e9;
+  border-left: 4px solid #4CAF50;
+  padding: 12px;
+  border-radius: 8px;
+  color: #2e7d32;
+  font-size: 0.9em;
+  margin-bottom: 12px;
+  font-weight: 500;
+}
+
 .error-message {
   background: #ffebee;
   border-left: 4px solid #f44336;

@@ -1,3 +1,6 @@
+// CORS Proxy helper - use for APIs that don't support CORS
+const CORS_PROXY = "https://api.allorigins.win/raw?url=";
+
 export const freeApis = [
   // Animals
   {
@@ -7,6 +10,7 @@ export const freeApis = [
     description: "Get random pictures of dogs",
     endpoint: "https://random.dog/woof.json",
     method: "GET",
+    corsProxy: true,
     exampleUrl: "https://random.dog/woof.json"
   },
   {
@@ -16,6 +20,7 @@ export const freeApis = [
     description: "Get random pictures of foxes",
     endpoint: "https://randomfox.ca/floof/",
     method: "GET",
+    corsProxy: true,
     exampleUrl: "https://randomfox.ca/floof/"
   },
   {
@@ -25,6 +30,7 @@ export const freeApis = [
     description: "Get daily cat facts",
     endpoint: "https://cat-fact.herokuapp.com/facts",
     method: "GET",
+    corsProxy: true,
     exampleUrl: "https://cat-fact.herokuapp.com/facts"
   },
   {
@@ -43,6 +49,7 @@ export const freeApis = [
     description: "Get random pictures of ducks",
     endpoint: "https://random-d.uk/api",
     method: "GET",
+    corsProxy: true,
     exampleUrl: "https://random-d.uk/api"
   },
   {
@@ -52,6 +59,7 @@ export const freeApis = [
     description: "Get random pictures of Shiba Inu, cats or birds",
     endpoint: "http://shibe.online/api/shibes",
     method: "GET",
+    corsProxy: true,
     exampleUrl: "http://shibe.online/api/shibes?count=1"
   },
   
