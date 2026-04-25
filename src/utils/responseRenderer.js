@@ -1,6 +1,6 @@
 /**
  * Smart response renderer that detects content type and returns appropriate JSX
- * Handles images, audio, text, JSON, and mixed content
+ * Handles images, audio, HTML, text, JSON, and mixed content
  */
 
 export const renderResponse = (data) => {
@@ -16,6 +16,12 @@ export const renderResponse = (data) => {
       return {
         type: 'audio',
         content: <audio controls className="response-audio"><source src={data} /></audio>
+      };
+    }
+    if (isHtmlContent(data)) {
+      return {
+        type: 'html',
+        content: <HtmlRenderer htmlContent={data} />
       };
     }
     // Plain text response
@@ -239,4 +245,67 @@ const isAudioUrl = (str) => {
   const lowerStr = str.toLowerCase();
   return audioExtensions.some(ext => lowerStr.includes(ext)) ||
          audioMimes.some(mime => lowerStr.includes(mime));
+};
+
+const isHtmlContent = (str) => {
+  if (typeof str !== 'string') return false;
+  // Check for common HTML tags
+  const htmlTagRegex = /<\s*\/?\s*(?:html|body|div|p|span|h[1-6]|a|img|ul|ol|li|table|form|input|button|script|style|head|title|meta|link)\b/i;
+  return htmlTagRegex.test(str);
+};
+
+// HTML Renderer Component
+const HtmlRenderer = ({ htmlContent }) => {
+  return (
+    <div className="response-html-container">
+      <div className="response-html-viewer">
+        <iframe
+          srcDoc={sanitizeHtml(htmlContent)}
+          className="html-iframe"
+          title="HTML Response"
+          sandbox="allow-same-origin allow-scripts"
+        />
+      </div>
+      <details className="html-source">
+        <summary>📄 View HTML Source</summary>
+        <pre className="response-json">
+          <code>{htmlContent}</code>
+        </pre>
+      </details>
+    </div>
+  );
+};
+
+// Sanitize HTML to prevent XSS while maintaining styling
+const sanitizeHtml = (html) => {
+  // Wrap in basic HTML structure if not already
+  if (!html.includes('<html') && !html.includes('<!DOCTYPE')) {
+    return `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <style>
+          * { margin: 0; padding: 0; box-sizing: border-box; }
+          body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; line-height: 1.6; color: #333; padding: 20px; background: #f9f9f9; }
+          img { max-width: 100%; height: auto; }
+          a { color: #667eea; text-decoration: none; }
+          a:hover { text-decoration: underline; }
+          table { border-collapse: collapse; width: 100%; margin: 15px 0; }
+          th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+          th { background: #667eea; color: white; }
+          tr:nth-child(even) { background: #f5f5f5; }
+          code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: 'Courier New', monospace; }
+          pre { background: #1e1e1e; color: #d4d4d4; padding: 15px; border-radius: 8px; overflow-x: auto; }
+          h1, h2, h3, h4, h5, h6 { margin: 15px 0 10px 0; }
+        </style>
+      </head>
+      <body>
+        ${html}
+      </body>
+      </html>
+    `;
+  }
+  return html;
 };
