@@ -1,5 +1,25 @@
-// CORS Proxy helper - use for APIs that don't support CORS
+// CORS Proxy helpers - multiple options for reliability
 export const CORS_PROXY = "https://api.allorigins.win/raw?url=";
+
+// Alternative CORS proxies as fallbacks
+export const CORS_PROXIES = [
+  {
+    name: "AllOrigins",
+    url: "https://api.allorigins.win/raw?url=",
+    encode: true
+  },
+  {
+    name: "CORS Anywhere",
+    url: "https://cors-anywhere.herokuapp.com/",
+    encode: false,
+    needsPrefix: true
+  },
+  {
+    name: "JSONP Fallback",
+    url: "https://cors-proxy.fringe.zone/?url=",
+    encode: true
+  }
+];
 
 export const freeApis = [
   // Animals

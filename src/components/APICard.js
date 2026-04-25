@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import '../styles/APICard.css';
-import { CORS_PROXY } from '../data/apis';
+import { CORS_PROXY, CORS_PROXIES } from '../data/apis';
 import { renderResponse } from '../utils/responseRenderer';
 
 function APICard({ api }) {
@@ -53,23 +53,51 @@ function APICard({ api }) {
         // First attempt: try direct request
         response = await fetch(url, options);
       } catch (fetchErr) {
-        // Second attempt: try with CORS proxy if available
+        // Second attempt: try with CORS proxies if available
         if (api.corsProxy && fetchErr.message.includes('Failed to fetch')) {
-          setUsedProxy(true);
-          try {
-            finalUrl = CORS_PROXY + encodeURIComponent(url);
-            response = await fetch(finalUrl, {
-              method: 'GET', // CORS proxy only supports GET
-              headers: {
-                'Accept': 'application/json',
-              },
-            });
-          } catch (proxyErr) {
+          let proxySucceeded = false;
+          let lastProxyError = null;
+
+          // Try each CORS proxy until one works
+          for (const proxy of CORS_PROXIES) {
+            try {
+              setUsedProxy(true);
+              let proxyUrl;
+              
+              if (proxy.needsPrefix) {
+                proxyUrl = proxy.url + url;
+              } else {
+                proxyUrl = proxy.url + (proxy.encode ? encodeURIComponent(url) : url);
+              }
+
+              response = await fetch(proxyUrl, {
+                method: 'GET',
+                headers: {
+                  'Accept': 'application/json',
+                },
+              });
+              
+              proxySucceeded = true;
+              break; // Success! Exit the loop
+            } catch (proxyErr) {
+              lastProxyError = proxyErr;
+              // Continue to next proxy
+              continue;
+            }
+          }
+
+          if (!proxySucceeded) {
             setError(
-              `❌ CORS Error - Proxy Also Failed\n\n` +
-              `Why: The API doesn't allow cross-origin requests, and the proxy couldn't help.\n\n` +
-              `What: This API has strict CORS restrictions.\n\n` +
-              `Try: Test the API directly at: ${url}`
+              `❌ CORS Error - All Proxies Failed\n\n` +
+              `Why: The API doesn't allow cross-origin requests, and all CORS proxies are unavailable.\n\n` +
+              `What: This API has strict CORS restrictions:\n` +
+              `• Primary proxy (AllOrigins): Unreachable\n` +
+              `• Secondary proxy (CORS Anywhere): Unreachable\n` +
+              `• Fallback proxy (Fringe Zone): Unreachable\n\n` +
+              `Try: \n` +
+              `1. Test the API directly at: ${url}\n` +
+              `2. Check your internet connection\n` +
+              `3. The API server might be offline`
             );
             setLoading(false);
             return;
