@@ -47,7 +47,6 @@ function APICard({ api }) {
 
       let response;
       let finalUrl = url;
-      let attemptedWithProxy = false;
 
       try {
         // First attempt: try direct request
@@ -55,7 +54,6 @@ function APICard({ api }) {
       } catch (fetchErr) {
         // Second attempt: try with CORS proxy if available
         if (api.corsProxy && fetchErr.message.includes('Failed to fetch')) {
-          attemptedWithProxy = true;
           setUsedProxy(true);
           try {
             finalUrl = CORS_PROXY + encodeURIComponent(url);
