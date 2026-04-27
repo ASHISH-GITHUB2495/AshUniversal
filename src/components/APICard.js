@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import '../styles/APICard.css';
-import { CORS_PROXY, CORS_PROXIES } from '../data/apis';
+import { CORS_PROXIES } from '../data/apis';
 import { renderResponse } from '../utils/responseRenderer';
 
 function APICard({ api }) {
@@ -47,7 +47,6 @@ function APICard({ api }) {
       }
 
       let response;
-      let finalUrl = url;
 
       try {
         // First attempt: try direct request
@@ -56,7 +55,6 @@ function APICard({ api }) {
         // Second attempt: try with CORS proxies if available
         if (api.corsProxy && fetchErr.message.includes('Failed to fetch')) {
           let proxySucceeded = false;
-          let lastProxyError = null;
 
           // Try each CORS proxy until one works
           for (const proxy of CORS_PROXIES) {
@@ -80,7 +78,6 @@ function APICard({ api }) {
               proxySucceeded = true;
               break; // Success! Exit the loop
             } catch (proxyErr) {
-              lastProxyError = proxyErr;
               // Continue to next proxy
               continue;
             }
