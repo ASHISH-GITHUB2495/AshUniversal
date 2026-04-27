@@ -120,6 +120,31 @@
   min-height: 100px;
 }
 
+.endpoint-input {
+  font-family: 'Courier New', monospace;
+  font-size: 0.9em;
+  background: #fafbff;
+}
+
+.endpoint-preview {
+  margin: 8px 0 0 0;
+  padding: 10px;
+  background: #f0f4ff;
+  border-left: 3px solid #667eea;
+  border-radius: 4px;
+  font-size: 0.9em;
+  color: #333;
+  word-break: break-all;
+}
+
+.endpoint-preview code {
+  background: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.85em;
+  color: #d32f2f;
+}
+
 .call-btn {
   padding: 12px 24px;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);

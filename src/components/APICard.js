@@ -10,6 +10,7 @@ function APICard({ api }) {
   const [requestBody, setRequestBody] = useState('');
   const [queryParams, setQueryParams] = useState('');
   const [usedProxy, setUsedProxy] = useState(false);
+  const [editedEndpoint, setEditedEndpoint] = useState('');
 
   const handleCall = async () => {
     setLoading(true);
@@ -18,7 +19,7 @@ function APICard({ api }) {
     setUsedProxy(false);
 
     try {
-      let url = api.endpoint;
+      let url = editedEndpoint || api.endpoint;
 
       // Add query parameters if provided
       if (queryParams && api.method === 'GET') {
@@ -179,11 +180,25 @@ function APICard({ api }) {
 
       <div className="api-description">
         <p><strong>Description:</strong> {api.description}</p>
-        <p><strong>Endpoint:</strong> <code>{api.endpoint}</code></p>
+        <p><strong>Default Endpoint:</strong> <code>{api.endpoint}</code></p>
         {api.exampleUrl && <p><strong>Example:</strong> <code>{api.exampleUrl}</code></p>}
       </div>
 
       <div className="api-form">
+        <div className="form-group">
+          <label>🔧 Edit Endpoint (optional)</label>
+          <input
+            type="text"
+            value={editedEndpoint}
+            onChange={(e) => setEditedEndpoint(e.target.value)}
+            placeholder={api.endpoint}
+            className="form-input endpoint-input"
+          />
+          <small>Leave empty to use default endpoint. Clear this field to reset.</small>
+          {editedEndpoint && (
+            <p className="endpoint-preview"><strong>Using:</strong> <code>{editedEndpoint}</code></p>
+          )}
+        </div>
         {api.method === 'GET' && (
           <div className="form-group">
             <label>Query Parameters (optional)</label>
