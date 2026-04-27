@@ -49,6 +49,36 @@
   border-left: 4px solid #667eea;
 }
 
+.api-description code {
+  background: #e8eeff;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.9em;
+  color: #333;
+}
+
+.endpoint-display {
+  background: white;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #e0e0ff;
+  margin: 10px 0;
+}
+
+.endpoint-display p {
+  margin: 8px 0;
+  font-size: 0.95em;
+}
+
+.base-url {
+  color: #2196f3;
+  font-weight: 600;
+}
+
+.default-path {
+  color: #4caf50;
+}
+
 .api-description p {
   margin: 8px 0;
   color: #555;
@@ -126,6 +156,12 @@
   background: #fafbff;
 }
 
+.path-input {
+  font-family: 'Courier New', monospace;
+  font-size: 0.9em;
+  background: #f5f9ff;
+}
+
 .endpoint-preview {
   margin: 8px 0 0 0;
   padding: 10px;
@@ -137,7 +173,19 @@
   word-break: break-all;
 }
 
-.endpoint-preview code {
+.path-preview {
+  margin: 8px 0 0 0;
+  padding: 10px;
+  background: #f0f9ff;
+  border-left: 3px solid #2196f3;
+  border-radius: 4px;
+  font-size: 0.9em;
+  color: #333;
+  word-break: break-all;
+}
+
+.endpoint-preview code,
+.path-preview code {
   background: white;
   padding: 4px 8px;
   border-radius: 4px;

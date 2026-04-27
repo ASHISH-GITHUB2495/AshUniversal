@@ -3,6 +3,26 @@ import '../styles/APICard.css';
 import { CORS_PROXIES } from '../data/apis';
 import { renderResponse } from '../utils/responseRenderer';
 
+// Helper function to extract base URL (protocol + domain)
+const getBaseUrl = (endpoint) => {
+  try {
+    const url = new URL(endpoint);
+    return `${url.protocol}//${url.hostname}${url.port ? ':' + url.port : ''}`;
+  } catch (e) {
+    return endpoint;
+  }
+};
+
+// Helper function to extract path and query from endpoint
+const getPathAndQuery = (endpoint) => {
+  try {
+    const url = new URL(endpoint);
+    return url.pathname + url.search;
+  } catch (e) {
+    return '';
+  }
+};
+
 function APICard({ api }) {
   const [response, setResponse] = useState('');
   const [loading, setLoading] = useState(false);
@@ -10,7 +30,7 @@ function APICard({ api }) {
   const [requestBody, setRequestBody] = useState('');
   const [queryParams, setQueryParams] = useState('');
   const [usedProxy, setUsedProxy] = useState(false);
-  const [editedEndpoint, setEditedEndpoint] = useState('');
+  const [editedPath, setEditedPath] = useState('');
 
   const handleCall = async () => {
     setLoading(true);
@@ -19,7 +39,10 @@ function APICard({ api }) {
     setUsedProxy(false);
 
     try {
-      let url = editedEndpoint || api.endpoint;
+      const baseUrl = getBaseUrl(api.endpoint);
+      const defaultPath = getPathAndQuery(api.endpoint);
+      const finalPath = editedPath || defaultPath;
+      let url = baseUrl + finalPath;
 
       // Add query parameters if provided
       if (queryParams && api.method === 'GET') {
@@ -180,23 +203,26 @@ function APICard({ api }) {
 
       <div className="api-description">
         <p><strong>Description:</strong> {api.description}</p>
-        <p><strong>Default Endpoint:</strong> <code>{api.endpoint}</code></p>
+        <div className="endpoint-display">
+          <p><strong>Base URL:</strong> <code className="base-url">{getBaseUrl(api.endpoint)}</code></p>
+          <p><strong>Default Path:</strong> <code className="default-path">{getPathAndQuery(api.endpoint)}</code></p>
+        </div>
         {api.exampleUrl && <p><strong>Example:</strong> <code>{api.exampleUrl}</code></p>}
       </div>
 
       <div className="api-form">
         <div className="form-group">
-          <label>🔧 Edit Endpoint (optional)</label>
+          <label>🔧 Edit Path / Query (optional)</label>
           <input
             type="text"
-            value={editedEndpoint}
-            onChange={(e) => setEditedEndpoint(e.target.value)}
-            placeholder={api.endpoint}
-            className="form-input endpoint-input"
+            value={editedPath}
+            onChange={(e) => setEditedPath(e.target.value)}
+            placeholder={getPathAndQuery(api.endpoint)}
+            className="form-input path-input"
           />
-          <small>Leave empty to use default endpoint. Clear this field to reset.</small>
-          {editedEndpoint && (
-            <p className="endpoint-preview"><strong>Using:</strong> <code>{editedEndpoint}</code></p>
+          <small>Leave empty to use default path. Example: /v1/data?search=test</small>
+          {editedPath && (
+            <p className="path-preview"><strong>Using:</strong> <code>{getBaseUrl(api.endpoint)}{editedPath}</code></p>
           )}
         </div>
         {api.method === 'GET' && (
