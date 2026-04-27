@@ -368,6 +368,52 @@
   transform: translateY(-2px);
 }
 
+/* Video Player */
+.response-video-container {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin: 15px 0;
+  background: #f5f5f5;
+  padding: 15px;
+  border-radius: 8px;
+}
+
+.response-video {
+  width: 100%;
+  max-height: 500px;
+  border-radius: 8px;
+  background: #000;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.video-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 0.95em;
+  color: #555;
+  padding: 10px 0;
+}
+
+.video-name,
+.video-size {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.video-name strong,
+.video-size strong {
+  color: #333;
+  min-width: 50px;
+}
+
+.video-name {
+  word-break: break-all;
+}
+
 /* JSON Display */
 .response-json {
   background: #1e1e1e;

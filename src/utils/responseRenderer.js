@@ -12,6 +12,12 @@ export const renderResponse = (data) => {
         content: <img src={data} alt="API Response" className="response-image" />
       };
     }
+    if (isVideoUrl(data)) {
+      return {
+        type: 'video',
+        content: <VideoRenderer videoUrl={data} />
+      };
+    }
     if (isAudioUrl(data)) {
       return {
         type: 'audio',
@@ -57,12 +63,20 @@ export const renderResponse = (data) => {
   if (typeof data === 'object' && data !== null) {
     // Check for specific API response structures
     
-    // Random Dog API: { url, fileSizeBytes }
-    if (data.url && isImageUrl(data.url)) {
-      return {
-        type: 'image',
-        content: <img src={data.url} alt="API Response" className="response-image" />
-      };
+    // Random Dog API: { url, fileSizeBytes } - can be image or video
+    if (data.url) {
+      if (isVideoUrl(data.url)) {
+        return {
+          type: 'video',
+          content: <VideoRenderer videoUrl={data.url} fileName={data.url.split('/').pop()} fileSize={data.fileSizeBytes} />
+        };
+      }
+      if (isImageUrl(data.url)) {
+        return {
+          type: 'image',
+          content: <img src={data.url} alt="API Response" className="response-image" />
+        };
+      }
     }
 
     // Random Fox API: { image, link }
@@ -175,6 +189,33 @@ const AnimeRenderer = ({ animeData }) => {
   );
 };
 
+const VideoRenderer = ({ videoUrl, fileName, fileSize }) => {
+  const formatFileSize = (bytes) => {
+    if (!bytes) return '';
+    const units = ['B', 'KB', 'MB', 'GB'];
+    let size = bytes;
+    let unitIndex = 0;
+    while (size >= 1024 && unitIndex < units.length - 1) {
+      size /= 1024;
+      unitIndex++;
+    }
+    return `${size.toFixed(2)} ${units[unitIndex]}`;
+  };
+
+  return (
+    <div className="response-video-container">
+      <video controls className="response-video">
+        <source src={videoUrl} type="video/mp4" />
+        Your browser does not support the video tag.
+      </video>
+      <div className="video-info">
+        {fileName && <p className="video-name"><strong>File:</strong> {fileName}</p>}
+        {fileSize && <p className="video-size"><strong>Size:</strong> {formatFileSize(fileSize)}</p>}
+      </div>
+    </div>
+  );
+};
+
 const DictionaryRenderer = ({ dictData }) => {
   const word = Array.isArray(dictData) ? dictData[0] : dictData;
   
@@ -235,6 +276,16 @@ const isImageUrl = (str) => {
   const lowerStr = str.toLowerCase();
   return imageExtensions.some(ext => lowerStr.includes(ext)) ||
          imageMimes.some(mime => lowerStr.includes(mime));
+};
+
+const isVideoUrl = (str) => {
+  if (typeof str !== 'string') return false;
+  const videoExtensions = ['.mp4', '.webm', '.avi', '.mov', '.mkv', '.m3u8', '.flv'];
+  const videoMimes = ['video/'];
+  
+  const lowerStr = str.toLowerCase();
+  return videoExtensions.some(ext => lowerStr.includes(ext)) ||
+         videoMimes.some(mime => lowerStr.includes(mime));
 };
 
 const isAudioUrl = (str) => {
