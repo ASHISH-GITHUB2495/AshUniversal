@@ -146,6 +146,30 @@ export const renderResponse = (data) => {
       };
     }
 
+    // Open-Meteo Weather API: { current, latitude, longitude, timezone, ... }
+    if (data.current && (data.latitude !== undefined && data.longitude !== undefined)) {
+      return {
+        type: 'weather',
+        content: <WeatherRenderer weatherData={data} />
+      };
+    }
+
+    // REST Countries API: Array of countries with { name, flags, capital, ... }
+    if (Array.isArray(data) && data.length > 0 && data[0].name && data[0].flags) {
+      return {
+        type: 'countries',
+        content: <CountriesRenderer countries={data} />
+      };
+    }
+
+    // REST Countries API: Single country response
+    if (data.name && data.flags && (data.capital || data.region)) {
+      return {
+        type: 'country',
+        content: <CountryRenderer country={data} />
+      };
+    }
+
     // Generic JSON object
     return {
       type: 'json',
@@ -263,6 +287,240 @@ const DictionaryRenderer = ({ dictData }) => {
           ))}
         </div>
       )}
+    </div>
+  );
+};
+
+// Weather Renderer Component
+const WeatherRenderer = ({ weatherData }) => {
+  const { current, latitude, longitude, timezone } = weatherData;
+  
+  const getWeatherDescription = (code) => {
+    const weatherCodes = {
+      0: '☀️ Clear sky',
+      1: '🌤️ Mainly clear',
+      2: '⛅ Partly cloudy',
+      3: '☁️ Overcast',
+      45: '🌫️ Fog',
+      48: '🌫️ Foggy',
+      51: '🌧️ Light drizzle',
+      53: '🌧️ Moderate drizzle',
+      55: '🌧️ Dense drizzle',
+      61: '🌧️ Slight rain',
+      63: '🌧️ Moderate rain',
+      65: '🌧️ Heavy rain',
+      71: '❄️ Slight snow',
+      73: '❄️ Moderate snow',
+      75: '❄️ Heavy snow',
+      80: '🌦️ Slight showers',
+      81: '🌧️ Moderate showers',
+      82: '⛈️ Violent showers',
+      85: '❄️ Slight snow showers',
+      86: '❄️ Heavy snow showers',
+      95: '⛈️ Thunderstorm',
+      96: '⛈️ Thunderstorm with hail',
+      99: '⛈️ Thunderstorm with heavy hail'
+    };
+    return weatherCodes[code] || `Weather code: ${code}`;
+  };
+
+  return (
+    <div className="response-weather">
+      <div className="weather-header">
+        <h2>🌍 Weather Forecast</h2>
+        <p className="location">{timezone}</p>
+        <p className="coordinates">📍 {latitude.toFixed(2)}°, {longitude.toFixed(2)}°</p>
+      </div>
+
+      <div className="weather-current">
+        <div className="weather-main">
+          <div className="weather-description">
+            {getWeatherDescription(current.weather_code)}
+          </div>
+          <div className="temperature">
+            <span className="temp-value">{Math.round(current.temperature_2m)}°</span>
+            <span className="temp-unit">C</span>
+          </div>
+        </div>
+
+        <div className="weather-details-grid">
+          {current.relative_humidity_2m !== undefined && (
+            <div className="weather-detail">
+              <span className="detail-label">💧 Humidity</span>
+              <span className="detail-value">{current.relative_humidity_2m}%</span>
+            </div>
+          )}
+          
+          {current.apparent_temperature !== undefined && (
+            <div className="weather-detail">
+              <span className="detail-label">🌡️ Feels Like</span>
+              <span className="detail-value">{Math.round(current.apparent_temperature)}°C</span>
+            </div>
+          )}
+          
+          {current.wind_speed_10m !== undefined && (
+            <div className="weather-detail">
+              <span className="detail-label">💨 Wind Speed</span>
+              <span className="detail-value">{current.wind_speed_10m} km/h</span>
+            </div>
+          )}
+          
+          {current.wind_direction_10m !== undefined && (
+            <div className="weather-detail">
+              <span className="detail-label">🧭 Wind Direction</span>
+              <span className="detail-value">{current.wind_direction_10m}°</span>
+            </div>
+          )}
+          
+          {current.wind_gusts_10m !== undefined && (
+            <div className="weather-detail">
+              <span className="detail-label">💨 Wind Gusts</span>
+              <span className="detail-value">{current.wind_gusts_10m} km/h</span>
+            </div>
+          )}
+          
+          {current.precipitation !== undefined && (
+            <div className="weather-detail">
+              <span className="detail-label">🌧️ Precipitation</span>
+              <span className="detail-value">{current.precipitation} mm</span>
+            </div>
+          )}
+          
+          {current.cloud_cover !== undefined && (
+            <div className="weather-detail">
+              <span className="detail-label">☁️ Cloud Cover</span>
+              <span className="detail-value">{current.cloud_cover}%</span>
+            </div>
+          )}
+          
+          {current.pressure_msl !== undefined && (
+            <div className="weather-detail">
+              <span className="detail-label">🔽 Pressure</span>
+              <span className="detail-value">{current.pressure_msl} hPa</span>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Countries Renderer Component (for multiple countries)
+const CountriesRenderer = ({ countries }) => {
+  return (
+    <div className="response-countries">
+      <h2>🌍 Countries List</h2>
+      <div className="countries-grid">
+        {countries.map((country, idx) => (
+          <CountryCard key={idx} country={country} />
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// Country Card Component (for individual country in list)
+const CountryCard = ({ country }) => {
+  const flagUrl = country.flags?.png || country.flags?.svg;
+  const countryName = country.name?.common || country.name;
+
+  return (
+    <div className="country-card">
+      {flagUrl && (
+        <div className="country-flag-container">
+          <img src={flagUrl} alt={`${countryName} flag`} className="country-flag" />
+        </div>
+      )}
+      <div className="country-info">
+        <h3>{countryName}</h3>
+        {country.capital && <p><strong>Capital:</strong> {Array.isArray(country.capital) ? country.capital[0] : country.capital}</p>}
+        {country.region && <p><strong>Region:</strong> {country.region}</p>}
+        {country.population && <p><strong>Population:</strong> {(country.population / 1000000).toFixed(1)}M</p>}
+        {country.area && <p><strong>Area:</strong> {country.area.toLocaleString()} km²</p>}
+      </div>
+    </div>
+  );
+};
+
+// Country Renderer Component (for single country)
+const CountryRenderer = ({ country }) => {
+  const flagUrl = country.flags?.png || country.flags?.svg;
+  const countryName = country.name?.common || country.name;
+  const officialName = country.name?.official;
+
+  return (
+    <div className="response-country">
+      <div className="country-header">
+        {flagUrl && (
+          <div className="country-large-flag">
+            <img src={flagUrl} alt={`${countryName} flag`} />
+          </div>
+        )}
+        <div className="country-title">
+          <h2>{countryName}</h2>
+          {officialName && <p className="official-name">{officialName}</p>}
+          {country.altSpellings && country.altSpellings.length > 0 && (
+            <p className="alt-names">Also known as: {country.altSpellings.join(', ')}</p>
+          )}
+        </div>
+      </div>
+
+      <div className="country-details">
+        <div className="details-section">
+          <h3>🌍 Geography</h3>
+          {country.region && <p><strong>Region:</strong> {country.region}</p>}
+          {country.subregion && <p><strong>Subregion:</strong> {country.subregion}</p>}
+          {country.area && <p><strong>Area:</strong> {country.area.toLocaleString()} km²</p>}
+          {country.capital && <p><strong>Capital:</strong> {Array.isArray(country.capital) ? country.capital.join(', ') : country.capital}</p>}
+        </div>
+
+        <div className="details-section">
+          <h3>👥 Demographics</h3>
+          {country.population && <p><strong>Population:</strong> {(country.population).toLocaleString()}</p>}
+          {country.demonym && <p><strong>Demonym:</strong> {country.demonym}</p>}
+        </div>
+
+        <div className="details-section">
+          <h3>💰 Currencies</h3>
+          {country.currencies && Object.entries(country.currencies).map(([code, currency]) => (
+            <p key={code}><strong>{code}:</strong> {currency.name} ({currency.symbol})</p>
+          ))}
+        </div>
+
+        <div className="details-section">
+          <h3>🗣️ Languages</h3>
+          {country.languages && Object.entries(country.languages).map(([code, lang]) => (
+            <span key={code} className="language-badge">{lang}</span>
+          ))}
+        </div>
+
+        {country.timezones && (
+          <div className="details-section">
+            <h3>⏰ Timezones</h3>
+            <div className="timezones-list">
+              {country.timezones.map((tz, idx) => (
+                <span key={idx} className="timezone-badge">{tz}</span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {country.borders && country.borders.length > 0 && (
+          <div className="details-section">
+            <h3>🗺️ Borders</h3>
+            <p>{country.borders.join(', ')}</p>
+          </div>
+        )}
+
+        {country.gini && (
+          <div className="details-section">
+            <h3>📊 Gini Coefficient</h3>
+            {Object.entries(country.gini).map(([year, value]) => (
+              <p key={year}><strong>{year}:</strong> {value}</p>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
