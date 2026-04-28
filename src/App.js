@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
 import APICard from './components/APICard';
 import { freeApis } from './data/apis';
@@ -7,6 +7,28 @@ function App() {
   const [selectedApi, setSelectedApi] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [darkMode, setDarkMode] = useState(false);
+
+  // Load dark mode preference from localStorage
+  useEffect(() => {
+    const savedDarkMode = localStorage.getItem('darkMode') === 'true';
+    setDarkMode(savedDarkMode);
+    if (savedDarkMode) {
+      document.body.classList.add('dark-mode');
+    }
+  }, []);
+
+  // Toggle dark mode and save preference
+  const toggleDarkMode = () => {
+    const newDarkMode = !darkMode;
+    setDarkMode(newDarkMode);
+    localStorage.setItem('darkMode', newDarkMode);
+    if (newDarkMode) {
+      document.body.classList.add('dark-mode');
+    } else {
+      document.body.classList.remove('dark-mode');
+    }
+  };
 
   const categories = ['All', ...new Set(freeApis.map(api => api.category))];
   
@@ -19,6 +41,21 @@ function App() {
 
   return (
     <div className="App">
+      <div className="top-bar">
+        <div className="developer-info">
+          <span className="developer-label">Built by</span>
+          <span className="developer-name">Ashish Kumar Yadav</span>
+          <span className="ai-label">with GitHub Copilot AI</span>
+        </div>
+        <button 
+          className={`dark-mode-toggle ${darkMode ? 'active' : ''}`}
+          onClick={toggleDarkMode}
+          title="Toggle Dark Mode"
+        >
+          {darkMode ? '☀️' : '🌙'}
+        </button>
+      </div>
+
       <header className="header">
         <h1>🌐 Free API Explorer</h1>
         <p>Discover and test free APIs without authentication</p>
